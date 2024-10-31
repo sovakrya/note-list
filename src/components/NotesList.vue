@@ -29,7 +29,9 @@ const props = defineProps<{
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   border: solid 2px rgb(63, 88, 201);
   border-radius: 5px;
-  padding: 20px;
+  padding: 12px;
   justify-items: center;
+  cursor: pointer;
+  gap: 6px;
 }
 </style>
