@@ -1,0 +1,29 @@
+@import './base.css';
+
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#app {
+  font-weight: normal;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
