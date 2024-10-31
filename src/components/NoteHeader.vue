@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const emits = defineEmits<{
+  addNote: [string]
+}>()
+
+function addNote() {
+  emits('addNote', noteText.value)
+
+  noteText.value = ''
+}
+
 const noteText = ref('')
 </script>
 
@@ -12,7 +22,7 @@ const noteText = ref('')
       class="header-input"
       placeholder="Добавьте новую заметку..."
     />
-    <button class="header-add-btn">+</button>
+    <button class="header-add-btn" @click="addNote">+</button>
   </div>
 </template>
 
