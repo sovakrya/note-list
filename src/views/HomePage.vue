@@ -2,7 +2,11 @@
 import NoteHeader from '@/components/NoteHeader.vue'
 import NotesList from '@/components/NotesList.vue'
 import { addNote, getNotes, type Note } from '@/service/noteApi'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+
+onMounted(() => {
+  getNotesFromFetch()
+})
 
 const notes = ref<Note[]>([])
 
@@ -12,7 +16,13 @@ function getNotesFromFetch() {
   })
 }
 
-getNotesFromFetch()
+async function addNewNote(noteText: string) {
+  debugger
+  await addNote(noteText)
+  console.log(notes)
+  getNotesFromFetch()
+}
+
 function deleteNote(idx: number) {
   notes.value.splice(idx, 1)
 }
@@ -20,7 +30,7 @@ function deleteNote(idx: number) {
 
 <template>
   <div class="main-box">
-    <NoteHeader />
+    <NoteHeader @add-note="addNewNote" />
     <NotesList :notes @remove="deleteNote" />
   </div>
 </template>

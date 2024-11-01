@@ -51,7 +51,6 @@ export async function addNote(noteTitle: string) {
       'Content-type': 'application/json; charset=UTF-8',
     },
   })
-
   return resp.json()
 }
 
