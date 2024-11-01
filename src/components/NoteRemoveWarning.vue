@@ -88,6 +88,10 @@ function closeDialog() {
   border-radius: 8px;
 }
 
+.remove-warning-box::backdrop {
+  background-color: rgba(0, 0, 0, 0.39);
+}
+
 .remove-warning-content-box {
   display: flex;
   flex-direction: column;

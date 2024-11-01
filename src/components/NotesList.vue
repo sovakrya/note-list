@@ -32,7 +32,8 @@ const emits = defineEmits<{
 .note-list-box {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  border: solid 2px rgb(63, 88, 201);
+  background-color: rgb(169 185 255 / 33%);
+  color: #132ea8;
   border-radius: 5px;
   padding: 12px;
   justify-items: center;
