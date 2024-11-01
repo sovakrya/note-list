@@ -19,6 +19,7 @@ const emits = defineEmits<{
       :note
       class="note-list-box"
       @delete-note="emits('remove', idx)"
+      @click="$router.push({ name: 'settings', params: { noteId: note.id } })"
     />
   </div>
 </template>
