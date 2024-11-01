@@ -25,7 +25,11 @@ const dialogRemoveWarning = ref(false)
       </ul>
     </div>
 
-    <button @click="dialogRemoveWarning = true" class="note-remove-btn">
+    <button
+      @click="dialogRemoveWarning = true"
+      class="note-remove-btn"
+      @click.stop
+    >
       Удалить
     </button>
 

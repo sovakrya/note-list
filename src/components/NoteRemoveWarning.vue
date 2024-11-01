@@ -36,12 +36,6 @@ watch(show, show => {
   }
 })
 
-function deleteAndCloseDialog() {
-  emits('removeNote')
-
-  closeDialog()
-}
-
 function openDialog() {
   if (!warningDialog.value) {
     return
@@ -69,10 +63,18 @@ function closeDialog() {
       <span class="warning-title">Вы точно хотите удалить заметку?</span>
 
       <div class="warning-actions-box">
-        <button @click="emits('removeNote')" class="warning-btn warning-btn-ok">
+        <button
+          @click="emits('removeNote')"
+          class="warning-btn warning-btn-ok"
+          @click.stop
+        >
           Да
         </button>
-        <button @click="closeDialog" class="warning-btn warning-btn-cancel">
+        <button
+          @click="closeDialog"
+          class="warning-btn warning-btn-cancel"
+          @click.stop
+        >
           Отмена
         </button>
       </div>
