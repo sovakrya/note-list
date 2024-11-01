@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import type { Note } from '@/views/HomePage.vue'
+import NoteRemoveWarning from './NoteRemoveWarning.vue'
+import { ref } from 'vue'
 
 const props = defineProps<{
   note: Note
 }>()
+
+const emits = defineEmits<{
+  deleteNote: []
+}>()
+
+let a = 0
+const dialogRemoveWarning = ref(false)
 </script>
 
 <template>
@@ -11,12 +20,17 @@ const props = defineProps<{
     <span class="note-title">{{ props.note.title }}</span>
 
     <div v-if="props.note.todoList">
-      <ul v-for="todo in props.note.todoList">
+      <ul v-for="(todo, idx) of props.note.todoList" :key="todo.id">
         <li>{{ todo.title }}</li>
       </ul>
     </div>
 
-    <button>X</button>
+    <button @click="dialogRemoveWarning = true">X</button>
+
+    <NoteRemoveWarning
+      v-model:show="dialogRemoveWarning"
+      @remove-note="emits('deleteNote')"
+    />
   </div>
 </template>
 

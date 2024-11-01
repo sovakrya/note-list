@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 
-const props = defineProps<{
-  noteTitle: string
-}>()
-
 onMounted(() => {
   if (!warningDialog) {
     return
@@ -23,6 +19,11 @@ function closeOnBackDropClick({ currentTarget, target }: MouseEvent) {
     show.value = false
   }
 }
+
+const emits = defineEmits<{
+  removeNote: []
+}>()
+
 const warningDialog = ref<HTMLDialogElement>()
 
 const show = defineModel<boolean>('show', { default: false })
@@ -34,6 +35,12 @@ watch(show, show => {
     closeDialog()
   }
 })
+
+function deleteAndCloseDialog() {
+  emits('removeNote')
+
+  closeDialog()
+}
 
 function openDialog() {
   if (!warningDialog.value) {
@@ -59,11 +66,15 @@ function closeDialog() {
 <template>
   <dialog ref="warningDialog" class="remove-warning-box">
     <div class="remove-warning-content-box">
-      <span>Вы точно хотите удалить заметку?</span>
+      <span class="warning-title">Вы точно хотите удалить заметку?</span>
 
-      <div>
-        <button>Да</button>
-        <button @click="closeDialog">Отмена</button>
+      <div class="warning-actions-box">
+        <button @click="emits('removeNote')" class="warning-btn warning-btn-ok">
+          Да
+        </button>
+        <button @click="closeDialog" class="warning-btn warning-btn-cancel">
+          Отмена
+        </button>
       </div>
     </div>
   </dialog>
@@ -80,6 +91,51 @@ function closeDialog() {
 .remove-warning-content-box {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20px;
+  width: 500px;
+  height: 200px;
+}
+
+.warning-title {
+  font-weight: 600;
+  font-size: 22px;
+}
+
+.warning-actions-box {
+  display: flex;
+  gap: 18px;
+}
+
+.warning-btn {
+  width: 70px;
+  height: 34px;
+  background: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.warning-btn-ok {
+  background-color: rgb(63, 88, 201);
+  color: azure;
+  font-weight: 600;
+}
+
+.warning-btn-ok:hover {
+  background-color: rgb(86, 112, 226);
+}
+
+.warning-btn-cancel {
+  background-color: rgb(227 227 227);
+}
+
+.warning-btn-cancel:hover {
+  background-color: rgb(209, 209, 209);
 }
 </style>

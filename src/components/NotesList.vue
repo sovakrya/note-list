@@ -5,15 +5,20 @@ import NoteItem from './NoteItem.vue'
 const props = defineProps<{
   notes: Note[]
 }>()
+
+const emits = defineEmits<{
+  remove: [number]
+}>()
 </script>
 
 <template>
   <div class="note-list-wrapper">
     <NoteItem
-      v-for="note in props.notes"
+      v-for="(note, idx) of props.notes"
       :key="note.id"
       :note
       class="note-list-box"
+      @delete-note="emits('remove', idx)"
     />
   </div>
 </template>

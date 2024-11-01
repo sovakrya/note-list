@@ -23,12 +23,16 @@ function addNewNote(noteText: string) {
     title: noteText,
   })
 }
+
+function deleteNote(idx: number) {
+  notes.value.splice(idx, 1)
+}
 </script>
 
 <template>
   <div class="main-box">
     <NoteHeader @add-note="addNewNote" />
-    <NotesList :notes />
+    <NotesList :notes @remove="deleteNote" />
   </div>
 </template>
 
