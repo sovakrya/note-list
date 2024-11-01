@@ -1,12 +1,9 @@
 <script setup lang="ts">
+import { addNote } from '@/service/noteApi'
 import { ref } from 'vue'
 
-const emits = defineEmits<{
-  addNote: [string]
-}>()
-
-function addNote() {
-  emits('addNote', noteText.value)
+function addNewNote() {
+  addNote(noteText.value)
 
   noteText.value = ''
 }
@@ -22,7 +19,7 @@ const noteText = ref('')
       class="header-input"
       placeholder="Добавьте новую заметку..."
     />
-    <button class="header-add-btn" @click="addNote">+</button>
+    <button class="header-add-btn" @click="addNewNote">+</button>
   </div>
 </template>
 

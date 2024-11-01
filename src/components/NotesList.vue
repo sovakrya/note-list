@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Note } from '@/views/HomePage.vue'
+import type { Note } from '@/service/noteApi'
 import NoteItem from './NoteItem.vue'
 
 const props = defineProps<{
