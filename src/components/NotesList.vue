@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  remove: [number]
+  remove: [string]
 }>()
 </script>
 
@@ -18,7 +18,7 @@ const emits = defineEmits<{
       :key="note.id"
       :note
       class="note-list-box"
-      @delete-note="emits('remove', idx)"
+      @delete-note="emits('remove', note.documentId)"
       @click="$router.push({ name: 'settings', params: { noteId: note.id } })"
     />
   </div>

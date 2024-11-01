@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NoteHeader from '@/components/NoteHeader.vue'
 import NotesList from '@/components/NotesList.vue'
-import { addNote, getNotes, type Note } from '@/service/noteApi'
+import { addNote, deleteNote, getNotes, type Note } from '@/service/noteApi'
 import { onMounted, ref } from 'vue'
 
 onMounted(() => {
@@ -17,21 +17,22 @@ function getNotesFromFetch() {
 }
 
 async function addNewNote(noteText: string) {
-  debugger
   await addNote(noteText)
-  console.log(notes)
+
   getNotesFromFetch()
 }
 
-function deleteNote(idx: number) {
-  notes.value.splice(idx, 1)
+async function deleteNoteFromFetch(documentId: string) {
+  await deleteNote(documentId)
+
+  getNotesFromFetch()
 }
 </script>
 
 <template>
   <div class="main-box">
     <NoteHeader @add-note="addNewNote" />
-    <NotesList :notes @remove="deleteNote" />
+    <NotesList :notes @remove="deleteNoteFromFetch" />
   </div>
 </template>
 

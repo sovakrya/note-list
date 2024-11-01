@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Note } from '@/views/HomePage.vue'
+import type { Note } from '@/service/noteApi'
 import NoteRemoveWarning from './NoteRemoveWarning.vue'
 import { ref } from 'vue'
 
@@ -20,7 +20,7 @@ const dialogRemoveWarning = ref(false)
     <span class="note-title">{{ props.note.title }}</span>
 
     <div v-if="props.note.todoList">
-      <ul v-for="(todo, idx) of props.note.todoList" :key="todo.id">
+      <ul v-for="todo of props.note.todoList" :key="todo.id">
         <li>{{ todo.title }}</li>
       </ul>
     </div>
