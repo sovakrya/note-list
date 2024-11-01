@@ -14,12 +14,14 @@ const emits = defineEmits<{
 <template>
   <div class="note-list-wrapper">
     <NoteItem
-      v-for="(note, idx) of props.notes"
+      v-for="note of props.notes"
       :key="note.id"
       :note
       class="note-list-box"
       @delete-note="emits('remove', note.documentId)"
-      @click="$router.push({ name: 'settings', params: { noteId: note.id } })"
+      @click="
+        $router.push({ name: 'settings', params: { noteId: note.documentId } })
+      "
     />
   </div>
 </template>
