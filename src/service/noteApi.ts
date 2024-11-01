@@ -5,12 +5,13 @@ export type Todo = {
   documentId: string
   title: string
   isDone: boolean
+  note?: Note
 }
 export type Note = {
   id: number
   documentId: string
   title: string
-  todoList?: Todo[]
+  todos?: Todo[]
 }
 
 type NoteData = {
@@ -30,8 +31,10 @@ export async function getNotes(): Promise<NoteData> {
   return resp.json()
 }
 
-export async function getNote(documentId: string) {
-  const resp = await fetch(`${HOST}/api/notes/${documentId}?populate=*`, {
+export async function getNote(
+  documentId: string,
+): Promise<{ data: Note; meta: {} }> {
+  const resp = await fetch(`${HOST}/api/notes/${documentId}?populate=todos`, {
     method: 'GET',
   })
 
@@ -76,13 +79,16 @@ export async function deleteNote(documentId: string) {
   })
 }
 
-export async function addTodo(todo: Todo) {
+export async function addTodo(title: string, id: string) {
   const resp = await fetch(`${HOST}/api/todos`, {
     method: 'POST',
     body: JSON.stringify({
       data: {
-        title: todo.title,
+        title: title,
         isDone: false,
+        note: {
+          connect: { documentId: id },
+        },
       },
     }),
 

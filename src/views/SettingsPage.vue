@@ -20,7 +20,7 @@ onMounted(() => {
   <div class="settings-main-box">
     <SettingsHeader />
 
-    <SettingsContent class="settings-content" :note />
+    <SettingsContent class="settings-content" :note="note!" />
 
     <footer>
       <button>Отменить</button>

@@ -12,7 +12,7 @@ const router = createRouter({
     {
       path: '/settings/:noteId',
       name: 'settings',
-      component: () => import('../views/SettingsNote.vue'),
+      component: () => import('../views/SettingsPage.vue'),
     },
   ],
 })

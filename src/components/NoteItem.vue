@@ -11,7 +11,6 @@ const emits = defineEmits<{
   deleteNote: []
 }>()
 
-let a = 0
 const dialogRemoveWarning = ref(false)
 </script>
 
@@ -19,8 +18,8 @@ const dialogRemoveWarning = ref(false)
   <div>
     <span class="note-title">{{ props.note.title }}</span>
 
-    <div v-if="props.note.todoList">
-      <ul v-for="todo of props.note.todoList" :key="todo.id">
+    <div v-if="props.note.todos">
+      <ul v-for="todo of props.note.todos" :key="todo.id">
         <li>{{ todo.title }}</li>
       </ul>
     </div>
