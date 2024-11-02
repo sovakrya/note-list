@@ -5,7 +5,7 @@ import { getNote, type Note, type Todo } from '@/service/noteApi'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-export type ModifiedNote = {
+type ModifiedNote = {
   titleNote?: string
   todoDocumentId?: string
   action: 'toggle' | 'delete' | 'add' | 'update'
@@ -84,8 +84,17 @@ function updateTodo(updatedTodo: {
       todo.title = updatedTodo.title
     }
   })
+}
 
-  console.log(editableNote.value)
+function updateNoteTitle({ title, from }: { title: string; from: string }) {
+  queueСhanges.push({
+    titleNote: title,
+    action: 'update',
+    from,
+  })
+
+  editableNote.value!.title = title
+  console.log(editableNote.value?.title)
 }
 function undoChange() {}
 
@@ -108,6 +117,7 @@ function redoUndoneChange() {}
       @deleteTodo="removeTodo"
       @addTodo="addNewTodo"
       @update-todo="updateTodo"
+      @update-note-title="updateNoteTitle"
     />
 
     <footer class="footer-box">

@@ -8,6 +8,7 @@ const emits = defineEmits<{
   deleteTodo: [Todo]
   addTodo: [string]
   updateTodo: [{ title: string; documentId: string; from: string }]
+  updateNoteTitle: [{ title: string; from: string }]
 }>()
 
 const props = defineProps<{
@@ -16,14 +17,26 @@ const props = defineProps<{
 
 const todoTitle = ref('')
 const todos = ref(props.editableNote.todos)
-let noteTitle = props.editableNote.title
+const noteTitle = ref(props.editableNote.title)
+
+function updateNoteTitle(e: Event) {
+  const temp = noteTitle.value
+
+  if (!(e.target instanceof HTMLElement)) {
+    return
+  }
+
+  noteTitle.value = e.target.textContent!
+
+  emits('updateNoteTitle', { title: noteTitle.value, from: temp })
+}
 </script>
 
 <template>
   <div class="settings-content-box">
     <div class="settings-title-box">
       <h2>Название заметки:</h2>
-      <h2 contenteditable>{{ noteTitle }}</h2>
+      <h2 contenteditable @blur="e => updateNoteTitle(e)">{{ noteTitle }}</h2>
     </div>
 
     <div class="todo-box">
