@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+const emits = defineEmits<{
+  removeNote: []
+}>()
 
 onMounted(() => {
   if (!warningDialog) {
@@ -19,10 +22,6 @@ function closeOnBackDropClick({ currentTarget, target }: MouseEvent) {
     show.value = false
   }
 }
-
-const emits = defineEmits<{
-  removeNote: []
-}>()
 
 const warningDialog = ref<HTMLDialogElement>()
 

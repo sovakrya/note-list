@@ -1,10 +1,31 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import NoteRemoveWarning from './NoteRemoveWarning.vue'
+
+const emits = defineEmits<{
+  deleteNote: []
+  undoChange: []
+  redoUndoneChange: []
+}>()
+
+const dialogRemove = ref(false)
+</script>
 
 <template>
   <header class="header-box">
-    <button class="header-btn">Удалить заметку</button>
-    <button class="header-btn">Отменить изменения</button>
-    <button class="header-btn">Повторить отмененое изменение</button>
+    <button class="header-btn" @click="dialogRemove = true">
+      Удалить заметку
+    </button>
+    <NoteRemoveWarning
+      v-model:show="dialogRemove"
+      @remove-note="emits('deleteNote')"
+    />
+    <button class="header-btn" @click="emits('undoChange')">
+      Отменить изменения
+    </button>
+    <button class="header-btn" @click="emits('redoUndoneChange')">
+      Повторить отмененое изменение
+    </button>
   </header>
 </template>
 

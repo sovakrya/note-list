@@ -4,22 +4,25 @@ import { ref } from 'vue'
 import TodoList from './TodoList.vue'
 
 const props = defineProps<{
-  note: Note
+  editableNote: Note
 }>()
 
 getTodos()
 
 const todoTitle = ref('')
 const todos = ref<Todo[]>()
-let noteTitle = props.note.title
+const editableTodos = ref<Todo[]>([])
+let noteTitle = props.editableNote.title
 function getTodos() {
-  getNote(props.note?.documentId!).then(res => {
+  console.log(props.editableNote)
+  getNote(props.editableNote.documentId).then(res => {
     todos.value = res.data.todos
+    editableTodos.value = JSON.parse(JSON.stringify(todos.value))
   })
 }
 
 async function addNewTodo() {
-  await addTodo(todoTitle.value, props.note?.documentId!)
+  await addTodo(todoTitle.value, props.editableNote.documentId!)
   getTodos()
   todoTitle.value = ''
 }
@@ -48,7 +51,7 @@ async function addNewTodo() {
       <div v-if="!todos?.length">
         <span>Пока у вас нет не одной задачи! </span>
       </div>
-      <TodoList :todos="todos!" v-else />
+      <TodoList :todos="editableTodos" v-else @check-todo="" @delete-todo="" />
     </div>
   </div>
 </template>

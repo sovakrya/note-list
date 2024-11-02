@@ -8,20 +8,35 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
+const editableNote = ref<Note>()
+let canceledNote: Note
 
 getNote(id).then(res => {
   console.log(res.data)
   note.value = res.data
+  editableNote.value = JSON.parse(JSON.stringify(note.value))
 })
+
+function undoChange() {
+  canceledNote = JSON.parse(JSON.stringify(editableNote.value))
+  editableNote.value = JSON.parse(JSON.stringify(note.value))
+}
+
+function redoUndoneChange() {
+  editableNote.value = JSON.parse(JSON.stringify(canceledNote))
+}
 </script>
 
 <template>
-  <div v-if="!note">Загрузка...</div>
+  <div v-if="!editableNote">Загрузка...</div>
 
   <div class="settings-main-box" v-else>
-    <SettingsHeader />
-
-    <SettingsContent class="settings-content" :note="note" />
+    <SettingsHeader
+      @undoChange="undoChange"
+      @redoUndoneChange="redoUndoneChange"
+      @deleteNote=""
+    />
+    <SettingsContent class="settings-content" :editableNote="editableNote" />
 
     <footer class="footer-box">
       <button class="footer-btn">Отменить</button>
