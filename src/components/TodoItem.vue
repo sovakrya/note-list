@@ -5,13 +5,17 @@ import { ref } from 'vue'
 const emits = defineEmits<{
   removeTodo: []
   executeTodo: [{ documentId: string; from: boolean; to: boolean }]
+  updateTodo: [string]
 }>()
 
 const props = defineProps<{
   todo: Todo
 }>()
 
+function updateTodoEmit() {}
+
 let todoTitle = ref(props.todo.title)
+const titleEl = ref()
 </script>
 
 <template>
@@ -30,7 +34,13 @@ let todoTitle = ref(props.todo.title)
         "
       />
 
-      <span class="todo-item-title" contenteditable>{{ todoTitle }}</span>
+      <span
+        class="todo-item-title"
+        contenteditable
+        @input="e => console.log(e.target.textContent)"
+        :ref="titleEl"
+        >{{ todoTitle }}</span
+      >
     </div>
 
     <button class="todo-item-remove-btn" @click="emits('removeTodo')">

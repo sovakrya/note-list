@@ -7,13 +7,13 @@ import { useRoute } from 'vue-router'
 
 export type ModifiedNote = {
   titleNote?: string
-  todoDocumentId: string
-  field: 'toggle' | 'delete' | 'add' | 'update'
+  todoDocumentId?: string
+  action: 'toggle' | 'delete' | 'add' | 'update'
   from: unknown
 }
 
 const queueСhanges: ModifiedNote[] = []
-const queueСanceledСhanges: ModifiedNote[] = []
+const stackСanceledСhanges: ModifiedNote[] = []
 
 const route = useRoute()
 const id = route.params.noteId as string
@@ -28,7 +28,7 @@ getNote(id).then(res => {
 function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
   queueСhanges.push({
     todoDocumentId: modifiedTodo.documentId,
-    field: 'toggle',
+    action: 'toggle',
     from: modifiedTodo.from,
   })
 
@@ -42,7 +42,7 @@ function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
 function removeTodo(todo: Todo) {
   queueСhanges.push({
     todoDocumentId: todo.documentId,
-    field: 'delete',
+    action: 'delete',
     from: todo,
   })
 
@@ -51,7 +51,22 @@ function removeTodo(todo: Todo) {
   })
   editableNote.value!.todos!.splice(idx!, 1)
 }
-
+let str = 'sdfsdf'
+let newId = 200
+function addNewTodo(title: string) {
+  queueСhanges.push({
+    action: 'add',
+    from: 'title',
+  })
+  str += 'a'
+  newId += 1
+  editableNote.value?.todos?.push({
+    documentId: str,
+    id: newId,
+    isDone: false,
+    title,
+  })
+}
 function undoChange() {}
 
 function redoUndoneChange() {}
@@ -71,6 +86,7 @@ function redoUndoneChange() {}
       :editableNote="editableNote"
       @checkTodo="toggleTodo"
       @deleteTodo="removeTodo"
+      @addTodo="addNewTodo"
     />
 
     <footer class="footer-box">

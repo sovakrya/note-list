@@ -6,6 +6,7 @@ import TodoList from './TodoList.vue'
 const emits = defineEmits<{
   checkTodo: [{ documentId: string; from: boolean }]
   deleteTodo: [Todo]
+  addTodo: [string]
 }>()
 
 const props = defineProps<{
@@ -15,10 +16,6 @@ const props = defineProps<{
 const todoTitle = ref('')
 const todos = ref(props.editableNote.todos)
 let noteTitle = props.editableNote.title
-
-function addNewTodo() {
-  todoTitle.value = ''
-}
 </script>
 
 <template>
@@ -38,7 +35,9 @@ function addNewTodo() {
           class="todo-add-input"
           placeholder="Например, погладить кота..."
         />
-        <button @click="addNewTodo" class="todo-add-btn">+</button>
+        <button @click="emits('addTodo', todoTitle)" class="todo-add-btn">
+          +
+        </button>
       </div>
 
       <div v-if="!todos?.length">
