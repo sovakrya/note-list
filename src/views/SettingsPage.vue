@@ -2,29 +2,30 @@
 import SettingsContent from '@/components/SettingsContent.vue'
 import SettingsHeader from '@/components/SettingsHeader.vue'
 import { getNote, type Note } from '@/service/noteApi'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
 
-onMounted(() => {
-  getNote(id).then(res => {
-    note.value = res.data
-  })
+getNote(id).then(res => {
+  console.log(res.data)
+  note.value = res.data
 })
 </script>
 
 <template>
-  <div class="settings-main-box">
+  <div v-if="!note">Загрузка...</div>
+
+  <div class="settings-main-box" v-else>
     <SettingsHeader />
 
-    <SettingsContent class="settings-content" :note="note!" />
+    <SettingsContent class="settings-content" :note="note" />
 
-    <footer>
-      <button>Отменить</button>
-      <button>Сохранить</button>
+    <footer class="footer-box">
+      <button class="footer-btn">Отменить</button>
+      <button class="footer-btn">Сохранить</button>
     </footer>
   </div>
 </template>
@@ -35,10 +36,33 @@ onMounted(() => {
   flex-direction: column;
   padding: 40px;
   height: 100%;
-  gap: 24px;
+  gap: 40px;
+  align-items: center;
 }
 
 .settings-content {
   flex-grow: 1;
+}
+
+.footer-box {
+  display: flex;
+  gap: 16px;
+  height: 70px;
+}
+
+.footer-btn {
+  cursor: pointer;
+  height: 40px;
+  font-size: 16px;
+  padding: 6px;
+  background-color: rgb(63, 88, 201);
+  border: none;
+  color: aliceblue;
+  border-radius: 5px;
+  transition: all 0.4s;
+}
+
+.footer-btn:hover {
+  background-color: rgb(110, 131, 223);
 }
 </style>

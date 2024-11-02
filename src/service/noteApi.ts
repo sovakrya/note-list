@@ -34,7 +34,7 @@ export async function getNotes(): Promise<NoteData> {
 export async function getNote(
   documentId: string,
 ): Promise<{ data: Note; meta: {} }> {
-  const resp = await fetch(`${HOST}/api/notes/${documentId}?populate=todos`, {
+  const resp = await fetch(`${HOST}/api/notes/${documentId}?populate=*`, {
     method: 'GET',
   })
 
