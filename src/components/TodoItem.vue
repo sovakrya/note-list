@@ -5,17 +5,27 @@ import { ref } from 'vue'
 const emits = defineEmits<{
   removeTodo: []
   executeTodo: [{ documentId: string; from: boolean; to: boolean }]
-  updateTodo: [string]
+  updateTodo: [{ title: string; documentId: string; from: string }]
 }>()
 
 const props = defineProps<{
   todo: Todo
 }>()
 
-function updateTodoEmit() {}
+function updateTodoEmit(e: Event) {
+  if (!(e.target instanceof HTMLElement)) {
+    return
+  }
+  let temp = todoTitle.value
+  todoTitle.value = e.target.textContent!
+  emits('updateTodo', {
+    title: todoTitle.value,
+    documentId: props.todo.documentId,
+    from: temp,
+  })
+}
 
 let todoTitle = ref(props.todo.title)
-const titleEl = ref()
 </script>
 
 <template>
@@ -37,8 +47,7 @@ const titleEl = ref()
       <span
         class="todo-item-title"
         contenteditable
-        @input="e => console.log(e.target.textContent)"
-        :ref="titleEl"
+        @blur="e => updateTodoEmit(e)"
         >{{ todoTitle }}</span
       >
     </div>

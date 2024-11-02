@@ -52,7 +52,7 @@ function removeTodo(todo: Todo) {
   editableNote.value!.todos!.splice(idx!, 1)
 }
 let str = 'sdfsdf'
-let newId = 200
+let newId = 1000
 function addNewTodo(title: string) {
   queueСhanges.push({
     action: 'add',
@@ -66,6 +66,26 @@ function addNewTodo(title: string) {
     isDone: false,
     title,
   })
+}
+
+function updateTodo(updatedTodo: {
+  title: string
+  documentId: string
+  from: string
+}) {
+  queueСhanges.push({
+    todoDocumentId: updatedTodo.documentId,
+    action: 'update',
+    from: updatedTodo.from,
+  })
+
+  editableNote.value?.todos?.forEach(todo => {
+    if (todo.documentId === updatedTodo.documentId) {
+      todo.title = updatedTodo.title
+    }
+  })
+
+  console.log(editableNote.value)
 }
 function undoChange() {}
 
@@ -87,6 +107,7 @@ function redoUndoneChange() {}
       @checkTodo="toggleTodo"
       @deleteTodo="removeTodo"
       @addTodo="addNewTodo"
+      @update-todo="updateTodo"
     />
 
     <footer class="footer-box">

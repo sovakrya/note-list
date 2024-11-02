@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addTodo, getNote, type Note, type Todo } from '@/service/noteApi'
+import { type Note, type Todo } from '@/service/noteApi'
 import { ref } from 'vue'
 import TodoList from './TodoList.vue'
 
@@ -7,6 +7,7 @@ const emits = defineEmits<{
   checkTodo: [{ documentId: string; from: boolean }]
   deleteTodo: [Todo]
   addTodo: [string]
+  updateTodo: [{ title: string; documentId: string; from: string }]
 }>()
 
 const props = defineProps<{
@@ -48,6 +49,7 @@ let noteTitle = props.editableNote.title
         v-else
         @check-todo="modifiedTodo => emits('checkTodo', modifiedTodo)"
         @delete-todo="todo => emits('deleteTodo', todo)"
+        @update-todo="updatedTodo => emits('updateTodo', updatedTodo)"
       />
     </div>
   </div>
