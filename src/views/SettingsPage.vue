@@ -1,30 +1,60 @@
 <script setup lang="ts">
 import SettingsContent from '@/components/SettingsContent.vue'
 import SettingsHeader from '@/components/SettingsHeader.vue'
-import { getNote, type Note } from '@/service/noteApi'
+import { getNote, type Note, type Todo } from '@/service/noteApi'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+
+export type ModifiedNote = {
+  titleNote?: string
+  todoDocumentId: string
+  field: 'toggle' | 'delete' | 'add' | 'update'
+  from: unknown
+}
+
+const queueСhanges: ModifiedNote[] = []
+const queueСanceledСhanges: ModifiedNote[] = []
 
 const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
 const editableNote = ref<Note>()
-let canceledNote: Note
 
 getNote(id).then(res => {
-  console.log(res.data)
   note.value = res.data
   editableNote.value = JSON.parse(JSON.stringify(note.value))
 })
 
-function undoChange() {
-  canceledNote = JSON.parse(JSON.stringify(editableNote.value))
-  editableNote.value = JSON.parse(JSON.stringify(note.value))
+function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
+  queueСhanges.push({
+    todoDocumentId: modifiedTodo.documentId,
+    field: 'toggle',
+    from: modifiedTodo.from,
+  })
+
+  editableNote.value?.todos?.forEach(todo => {
+    if (todo.documentId === modifiedTodo.documentId) {
+      todo.isDone = !modifiedTodo.from
+    }
+  })
 }
 
-function redoUndoneChange() {
-  editableNote.value = JSON.parse(JSON.stringify(canceledNote))
+function removeTodo(todo: Todo) {
+  queueСhanges.push({
+    todoDocumentId: todo.documentId,
+    field: 'delete',
+    from: todo,
+  })
+
+  const idx = editableNote.value?.todos?.findIndex(val => {
+    return val.documentId === todo.documentId
+  })
+  editableNote.value!.todos!.splice(idx!, 1)
 }
+
+function undoChange() {}
+
+function redoUndoneChange() {}
 </script>
 
 <template>
@@ -36,7 +66,12 @@ function redoUndoneChange() {
       @redoUndoneChange="redoUndoneChange"
       @deleteNote=""
     />
-    <SettingsContent class="settings-content" :editableNote="editableNote" />
+    <SettingsContent
+      class="settings-content"
+      :editableNote="editableNote"
+      @checkTodo="toggleTodo"
+      @deleteTodo="removeTodo"
+    />
 
     <footer class="footer-box">
       <button class="footer-btn">Отменить</button>

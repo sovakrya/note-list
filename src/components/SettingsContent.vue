@@ -3,27 +3,20 @@ import { addTodo, getNote, type Note, type Todo } from '@/service/noteApi'
 import { ref } from 'vue'
 import TodoList from './TodoList.vue'
 
+const emits = defineEmits<{
+  checkTodo: [{ documentId: string; from: boolean }]
+  deleteTodo: [Todo]
+}>()
+
 const props = defineProps<{
   editableNote: Note
 }>()
 
-getTodos()
-
 const todoTitle = ref('')
-const todos = ref<Todo[]>()
-const editableTodos = ref<Todo[]>([])
+const todos = ref(props.editableNote.todos)
 let noteTitle = props.editableNote.title
-function getTodos() {
-  console.log(props.editableNote)
-  getNote(props.editableNote.documentId).then(res => {
-    todos.value = res.data.todos
-    editableTodos.value = JSON.parse(JSON.stringify(todos.value))
-  })
-}
 
-async function addNewTodo() {
-  await addTodo(todoTitle.value, props.editableNote.documentId!)
-  getTodos()
+function addNewTodo() {
   todoTitle.value = ''
 }
 </script>
@@ -51,7 +44,12 @@ async function addNewTodo() {
       <div v-if="!todos?.length">
         <span>Пока у вас нет не одной задачи! </span>
       </div>
-      <TodoList :todos="editableTodos" v-else @check-todo="" @delete-todo="" />
+      <TodoList
+        :todos="todos"
+        v-else
+        @check-todo="modifiedTodo => emits('checkTodo', modifiedTodo)"
+        @delete-todo="todo => emits('deleteTodo', todo)"
+      />
     </div>
   </div>
 </template>

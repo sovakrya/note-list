@@ -3,8 +3,8 @@ import type { Todo } from '@/service/noteApi'
 import TodoItem from './TodoItem.vue'
 
 const emits = defineEmits<{
-  checkTodo: [string]
-  deleteTodo: [string]
+  checkTodo: [{ documentId: string; from: boolean }]
+  deleteTodo: [Todo]
 }>()
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ const props = defineProps<{
     v-for="todo of props.todos"
     :key="todo.documentId"
     :todo
-    @execute-todo="emits('checkTodo', todo.documentId)"
-    @remove-todo="emits('deleteTodo', todo.documentId)"
+    @execute-todo="modifiedTodo => emits('checkTodo', modifiedTodo)"
+    @remove-todo="emits('deleteTodo', todo)"
   />
 </template>

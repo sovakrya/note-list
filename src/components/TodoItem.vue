@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 const emits = defineEmits<{
   removeTodo: []
-  executeTodo: []
+  executeTodo: [{ documentId: string; from: boolean; to: boolean }]
 }>()
 
 const props = defineProps<{
@@ -21,7 +21,13 @@ let todoTitle = ref(props.todo.title)
         type="checkbox"
         style="width: 18px; height: 18px"
         :checked="props.todo.isDone"
-        @click="emits('executeTodo')"
+        @click="
+          emits('executeTodo', {
+            documentId: props.todo.documentId,
+            from: props.todo.isDone,
+            to: !props.todo.isDone,
+          })
+        "
       />
 
       <span class="todo-item-title" contenteditable>{{ todoTitle }}</span>
