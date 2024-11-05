@@ -21,6 +21,7 @@ const noteText = ref('')
       v-model="noteText"
       class="header-input"
       placeholder="Добавьте новую заметку..."
+      @keydown.enter="addNote"
     />
     <button class="header-add-btn" @click="addNote">+</button>
   </div>

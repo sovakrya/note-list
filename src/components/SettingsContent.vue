@@ -19,6 +19,12 @@ const todoTitle = ref('')
 const todos = ref(props.editableNote.todos)
 const noteTitle = ref(props.editableNote.title)
 
+function addTodo() {
+  emits('addTodo', todoTitle.value)
+
+  todoTitle.value = ''
+}
+
 function updateNoteTitle(e: Event) {
   const temp = noteTitle.value
 
@@ -50,17 +56,16 @@ function updateNoteTitle(e: Event) {
           v-model="todoTitle"
           class="todo-add-input"
           placeholder="Например, погладить кота..."
+          @keydown.enter="addTodo"
         />
-        <button @click="emits('addTodo', todoTitle)" class="todo-add-btn">
-          +
-        </button>
+        <button @click="addTodo" class="todo-add-btn">+</button>
       </div>
 
-      <div v-if="!todos?.length">
+      <div v-if="!props.editableNote.todos?.length">
         <span>Пока у вас нет не одной задачи! </span>
       </div>
       <TodoList
-        :todos="todos"
+        :todos="props.editableNote.todos"
         v-else
         @check-todo="modifiedTodo => emits('checkTodo', modifiedTodo)"
         @delete-todo="todo => emits('deleteTodo', todo)"

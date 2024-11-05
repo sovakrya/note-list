@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import ModalCancelEditing from '@/components/ModalCancelEditing.vue'
 import SettingsContent from '@/components/SettingsContent.vue'
 import SettingsHeader from '@/components/SettingsHeader.vue'
-import { getNote, type Note, type Todo } from '@/service/noteApi'
+import {
+  addTodo,
+  deleteTodo,
+  getNote,
+  updateNote,
+  updateTodo,
+  type Note,
+  type Todo,
+} from '@/service/noteApi'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -20,10 +29,59 @@ const id = route.params.noteId as string
 const note = ref<Note>()
 const editableNote = ref<Note>()
 
+const dialog = ref(false)
+
+async function saveNote() {
+  if (editableNote.value!.title !== note.value!.title) {
+    await updateNote(editableNote.value!)
+  }
+
+  for (
+    let i = 0;
+    i < editableNote.value!.todos!.length + note.value!.todos!.length;
+    i++
+  ) {
+    const itemEditableNote = editableNote.value!.todos![i]
+    const itemNote = note.value!.todos![i]
+
+    const a = editableNote.value?.todos?.find(
+      todo => todo.documentId === itemNote.documentId,
+    )
+    if (!a) {
+      await deleteTodo(itemNote.documentId)
+      continue
+    }
+
+    console.log(itemEditableNote)
+    const b = note.value?.todos?.find(
+      todo => todo.documentId === itemEditableNote.documentId,
+    )
+
+    if (!b) {
+      await addTodo(itemEditableNote.title, note.value?.documentId!)
+      continue
+    } else {
+      if (itemEditableNote.isDone !== itemNote.isDone) {
+        await updateTodo(itemEditableNote)
+      }
+
+      if (itemEditableNote.title !== itemNote.title) {
+        await updateTodo(itemEditableNote)
+      }
+    }
+  }
+
+  await getNote(id)
+}
 getNote(id).then(res => {
   note.value = res.data
   editableNote.value = JSON.parse(JSON.stringify(note.value))
 })
+
+function undoEditing() {
+  editableNote.value = JSON.parse(JSON.stringify(note.value))
+  dialog.value = false
+}
 
 function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
   queueСhanges.value.push({
@@ -70,7 +128,7 @@ function addNewTodo(title: string) {
   })
 }
 
-function updateTodo(updatedTodo: {
+function updateTodoInEditableNote(updatedTodo: {
   title: string
   documentId: string
   from: string
@@ -204,13 +262,14 @@ function redoUndoneChange() {
       @checkTodo="toggleTodo"
       @deleteTodo="removeTodo"
       @addTodo="addNewTodo"
-      @update-todo="updateTodo"
+      @update-todo="updateTodoInEditableNote"
       @update-note-title="updateNoteTitle"
     />
 
     <footer class="footer-box">
-      <button class="footer-btn">Отменить</button>
-      <button class="footer-btn">Сохранить</button>
+      <button class="footer-btn" @click="dialog = true">Отменить</button>
+      <ModalCancelEditing v-model:show="dialog" @undo-editing="undoEditing" />
+      <button class="footer-btn" @click="saveNote">Сохранить</button>
     </footer>
   </div>
 </template>
