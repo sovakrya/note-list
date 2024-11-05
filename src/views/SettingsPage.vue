@@ -19,6 +19,8 @@ const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
 const editableNote = ref<Note>()
+const isBlockedUndoChage = ref(false)
+const isBlockedUndoChage
 
 getNote(id).then(res => {
   note.value = res.data
@@ -92,9 +94,7 @@ function updateNoteTitle({ title, from }: { title: string; from: string }) {
     action: 'updateNoteTitle',
     from,
   })
-  console.log({ title, from })
   editableNote.value!.title = title
-  console.log(editableNote.value?.title)
 }
 
 function undoChange() {
@@ -121,17 +121,61 @@ function undoChange() {
     case 'update':
       editableNote.value?.todos?.forEach(todo => {
         if (todo.documentId === changeItem.todoDocumentId) {
-          todo.title = changeItem.from as string
           stackСanceledСhanges.push({
             action: changeItem.action,
             from: todo.title,
             todoDocumentId: changeItem.todoDocumentId,
           })
+          todo.title = changeItem.from as string
         }
       })
       break
     case 'updateNoteTitle':
+      console.log(editableNote.value?.title)
       stackСanceledСhanges.push({
+        action: changeItem.action,
+        from: editableNote.value?.title,
+      })
+
+      editableNote.value!.title = changeItem.from as string
+      break
+  }
+}
+
+function redoUndoneChange() {
+  const changeItem = stackСanceledСhanges.pop()
+  const idx = editableNote.value?.todos?.findIndex(todo => {
+    return todo.documentId === changeItem!.todoDocumentId
+  })
+
+  switch (changeItem?.action) {
+    case 'add':
+      editableNote.value?.todos?.push(changeItem.from as Todo)
+      queueСhanges.push(changeItem)
+      break
+    case 'delete':
+      editableNote.value?.todos?.splice(idx!, 1)
+      queueСhanges.push(changeItem)
+      break
+    case 'toggle':
+      const currentTodo = editableNote.value?.todos![idx!]
+      editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
+      queueСhanges.push(changeItem)
+      break
+    case 'update':
+      queueСhanges.push({
+        action: changeItem.action,
+        from: changeItem.from,
+        todoDocumentId: changeItem.todoDocumentId,
+      })
+      editableNote.value?.todos?.forEach(todo => {
+        if (todo.documentId === changeItem.todoDocumentId) {
+          todo.title = changeItem.from as string
+        }
+      })
+      break
+    case 'updateNoteTitle':
+      queueСhanges.push({
         action: changeItem.action,
         from: editableNote.value?.title,
       })
@@ -139,8 +183,6 @@ function undoChange() {
       break
   }
 }
-
-function redoUndoneChange() {}
 </script>
 
 <template>

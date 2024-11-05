@@ -2,6 +2,11 @@
 import { ref } from 'vue'
 import NoteRemoveWarning from './NoteRemoveWarning.vue'
 
+const props = defineProps<{
+  isBlockedUndoChage: boolean
+  isBlockedRedoUndoChage: boolean
+}>()
+
 const emits = defineEmits<{
   deleteNote: []
   undoChange: []
@@ -20,10 +25,18 @@ const dialogRemove = ref(false)
       v-model:show="dialogRemove"
       @remove-note="emits('deleteNote')"
     />
-    <button class="header-btn" @click="emits('undoChange')">
+    <button
+      class="header-btn"
+      @click="emits('undoChange')"
+      :disabled="props.isBlockedUndoChage"
+    >
       Отменить изменения
     </button>
-    <button class="header-btn" @click="emits('redoUndoneChange')">
+    <button
+      class="header-btn"
+      @click="emits('redoUndoneChange')"
+      :disabled="props.isBlockedRedoUndoChage"
+    >
       Повторить отмененое изменение
     </button>
   </header>
