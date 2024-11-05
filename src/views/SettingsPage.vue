@@ -8,7 +8,7 @@ import { useRoute } from 'vue-router'
 type ModifiedNote = {
   titleNote?: string
   todoDocumentId?: string
-  action: 'toggle' | 'delete' | 'add' | 'update'
+  action: 'toggle' | 'delete' | 'add' | 'update' | 'updateNoteTitle'
   from: unknown
 }
 
@@ -89,14 +89,56 @@ function updateTodo(updatedTodo: {
 function updateNoteTitle({ title, from }: { title: string; from: string }) {
   queueСhanges.push({
     titleNote: title,
-    action: 'update',
+    action: 'updateNoteTitle',
     from,
   })
-
+  console.log({ title, from })
   editableNote.value!.title = title
   console.log(editableNote.value?.title)
 }
-function undoChange() {}
+
+function undoChange() {
+  const changeItem = queueСhanges.pop()
+
+  const idx = editableNote.value?.todos?.findIndex(todo => {
+    return todo.documentId === changeItem!.todoDocumentId
+  })
+
+  switch (changeItem?.action) {
+    case 'add':
+      editableNote.value?.todos?.pop()
+      stackСanceledСhanges.push(changeItem!)
+      break
+    case 'toggle':
+      const currentTodo = editableNote.value?.todos![idx!]
+      editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
+      stackСanceledСhanges.push(changeItem!)
+      break
+    case 'delete':
+      editableNote.value?.todos?.push(changeItem.from as Todo)
+      stackСanceledСhanges.push(changeItem!)
+      break
+    case 'update':
+      editableNote.value?.todos?.forEach(todo => {
+        if (todo.documentId === changeItem.todoDocumentId) {
+          todo.title = changeItem.from as string
+          stackСanceledСhanges.push({
+            action: changeItem.action,
+            from: todo.title,
+            todoDocumentId: changeItem.todoDocumentId,
+          })
+        }
+      })
+      break
+    case 'updateNoteTitle':
+      stackСanceledСhanges.push({
+        action: changeItem.action,
+        from: editableNote.value?.title,
+      })
+      editableNote.value!.title = changeItem.from as string
+      break
+  }
+}
 
 function redoUndoneChange() {}
 </script>

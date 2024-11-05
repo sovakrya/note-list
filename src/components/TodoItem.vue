@@ -16,16 +16,16 @@ function updateTodoEmit(e: Event) {
   if (!(e.target instanceof HTMLElement)) {
     return
   }
-  let temp = todoTitle.value
-  todoTitle.value = e.target.textContent!
+  let temp = todoTitle
+  todoTitle = e.target.textContent!
   emits('updateTodo', {
-    title: todoTitle.value,
+    title: todoTitle,
     documentId: props.todo.documentId,
     from: temp,
   })
 }
 
-let todoTitle = ref(props.todo.title)
+let todoTitle = props.todo.title
 </script>
 
 <template>
@@ -48,7 +48,7 @@ let todoTitle = ref(props.todo.title)
         class="todo-item-title"
         contenteditable
         @blur="e => updateTodoEmit(e)"
-        >{{ todoTitle }}</span
+        >{{ props.todo.title }}</span
       >
     </div>
 

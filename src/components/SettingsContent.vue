@@ -36,7 +36,9 @@ function updateNoteTitle(e: Event) {
   <div class="settings-content-box">
     <div class="settings-title-box">
       <h2>Название заметки:</h2>
-      <h2 contenteditable @blur="e => updateNoteTitle(e)">{{ noteTitle }}</h2>
+      <h2 contenteditable @blur="e => updateNoteTitle(e)">
+        {{ props.editableNote.title }}
+      </h2>
     </div>
 
     <div class="todo-box">
