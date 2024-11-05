@@ -12,15 +12,13 @@ type ModifiedNote = {
   from: unknown
 }
 
-const queueСhanges: ModifiedNote[] = []
-const stackСanceledСhanges: ModifiedNote[] = []
+const queueСhanges = ref<ModifiedNote[]>([])
+const stackСanceledСhanges = ref<ModifiedNote[]>([])
 
 const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
 const editableNote = ref<Note>()
-const isBlockedUndoChage = ref(false)
-const isBlockedUndoChage
 
 getNote(id).then(res => {
   note.value = res.data
@@ -28,7 +26,7 @@ getNote(id).then(res => {
 })
 
 function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
-  queueСhanges.push({
+  queueСhanges.value.push({
     todoDocumentId: modifiedTodo.documentId,
     action: 'toggle',
     from: modifiedTodo.from,
@@ -42,7 +40,7 @@ function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
 }
 
 function removeTodo(todo: Todo) {
-  queueСhanges.push({
+  queueСhanges.value.push({
     todoDocumentId: todo.documentId,
     action: 'delete',
     from: todo,
@@ -53,13 +51,10 @@ function removeTodo(todo: Todo) {
   })
   editableNote.value!.todos!.splice(idx!, 1)
 }
+
 let str = 'sdfsdf'
 let newId = 1000
 function addNewTodo(title: string) {
-  queueСhanges.push({
-    action: 'add',
-    from: 'title',
-  })
   str += 'a'
   newId += 1
   editableNote.value?.todos?.push({
@@ -68,6 +63,11 @@ function addNewTodo(title: string) {
     isDone: false,
     title,
   })
+
+  queueСhanges.value.push({
+    action: 'add',
+    from: { id: newId, documentId: str, title, isDone: false },
+  })
 }
 
 function updateTodo(updatedTodo: {
@@ -75,7 +75,7 @@ function updateTodo(updatedTodo: {
   documentId: string
   from: string
 }) {
-  queueСhanges.push({
+  queueСhanges.value.push({
     todoDocumentId: updatedTodo.documentId,
     action: 'update',
     from: updatedTodo.from,
@@ -89,7 +89,7 @@ function updateTodo(updatedTodo: {
 }
 
 function updateNoteTitle({ title, from }: { title: string; from: string }) {
-  queueСhanges.push({
+  queueСhanges.value.push({
     titleNote: title,
     action: 'updateNoteTitle',
     from,
@@ -98,7 +98,7 @@ function updateNoteTitle({ title, from }: { title: string; from: string }) {
 }
 
 function undoChange() {
-  const changeItem = queueСhanges.pop()
+  const changeItem = queueСhanges.value.pop()
 
   const idx = editableNote.value?.todos?.findIndex(todo => {
     return todo.documentId === changeItem!.todoDocumentId
@@ -107,21 +107,22 @@ function undoChange() {
   switch (changeItem?.action) {
     case 'add':
       editableNote.value?.todos?.pop()
-      stackСanceledСhanges.push(changeItem!)
+
+      stackСanceledСhanges.value.push(changeItem)
       break
     case 'toggle':
       const currentTodo = editableNote.value?.todos![idx!]
       editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
-      stackСanceledСhanges.push(changeItem!)
+      stackСanceledСhanges.value.push(changeItem!)
       break
     case 'delete':
       editableNote.value?.todos?.push(changeItem.from as Todo)
-      stackСanceledСhanges.push(changeItem!)
+      stackСanceledСhanges.value.push(changeItem!)
       break
     case 'update':
       editableNote.value?.todos?.forEach(todo => {
         if (todo.documentId === changeItem.todoDocumentId) {
-          stackСanceledСhanges.push({
+          stackСanceledСhanges.value.push({
             action: changeItem.action,
             from: todo.title,
             todoDocumentId: changeItem.todoDocumentId,
@@ -132,7 +133,7 @@ function undoChange() {
       break
     case 'updateNoteTitle':
       console.log(editableNote.value?.title)
-      stackСanceledСhanges.push({
+      stackСanceledСhanges.value.push({
         action: changeItem.action,
         from: editableNote.value?.title,
       })
@@ -143,7 +144,7 @@ function undoChange() {
 }
 
 function redoUndoneChange() {
-  const changeItem = stackСanceledСhanges.pop()
+  const changeItem = stackСanceledСhanges.value.pop()
   const idx = editableNote.value?.todos?.findIndex(todo => {
     return todo.documentId === changeItem!.todoDocumentId
   })
@@ -151,19 +152,20 @@ function redoUndoneChange() {
   switch (changeItem?.action) {
     case 'add':
       editableNote.value?.todos?.push(changeItem.from as Todo)
-      queueСhanges.push(changeItem)
+      console.log(changeItem)
+      queueСhanges.value.push(changeItem)
       break
     case 'delete':
       editableNote.value?.todos?.splice(idx!, 1)
-      queueСhanges.push(changeItem)
+      queueСhanges.value.push(changeItem)
       break
     case 'toggle':
       const currentTodo = editableNote.value?.todos![idx!]
       editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
-      queueСhanges.push(changeItem)
+      queueСhanges.value.push(changeItem)
       break
     case 'update':
-      queueСhanges.push({
+      queueСhanges.value.push({
         action: changeItem.action,
         from: changeItem.from,
         todoDocumentId: changeItem.todoDocumentId,
@@ -175,7 +177,7 @@ function redoUndoneChange() {
       })
       break
     case 'updateNoteTitle':
-      queueСhanges.push({
+      queueСhanges.value.push({
         action: changeItem.action,
         from: editableNote.value?.title,
       })
@@ -193,6 +195,8 @@ function redoUndoneChange() {
       @undoChange="undoChange"
       @redoUndoneChange="redoUndoneChange"
       @deleteNote=""
+      :is-blocked-redo-undo-chage="stackСanceledСhanges.length"
+      :is-blocked-undo-chage="queueСhanges.length"
     />
     <SettingsContent
       class="settings-content"

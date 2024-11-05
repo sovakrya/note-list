@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import NoteRemoveWarning from './NoteRemoveWarning.vue'
 
 const props = defineProps<{
-  isBlockedUndoChage: boolean
-  isBlockedRedoUndoChage: boolean
+  isBlockedUndoChage: number
+  isBlockedRedoUndoChage: number
 }>()
 
 const emits = defineEmits<{
@@ -28,14 +28,14 @@ const dialogRemove = ref(false)
     <button
       class="header-btn"
       @click="emits('undoChange')"
-      :disabled="props.isBlockedUndoChage"
+      :disabled="!props.isBlockedUndoChage"
     >
       Отменить изменения
     </button>
     <button
       class="header-btn"
       @click="emits('redoUndoneChange')"
-      :disabled="props.isBlockedRedoUndoChage"
+      :disabled="!props.isBlockedRedoUndoChage"
     >
       Повторить отмененое изменение
     </button>
@@ -63,5 +63,10 @@ const dialogRemove = ref(false)
 
 .header-btn:hover {
   background-color: rgb(110, 131, 223);
+}
+
+.header-btn:disabled {
+  background-color: rgb(117, 128, 179);
+  cursor: default;
 }
 </style>
