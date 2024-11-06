@@ -20,6 +20,10 @@ const todos = ref(props.editableNote.todos)
 const noteTitle = ref(props.editableNote.title)
 
 function addTodo() {
+  if (!todoTitle.value) {
+    return
+  }
+
   emits('addTodo', todoTitle.value)
 
   todoTitle.value = ''

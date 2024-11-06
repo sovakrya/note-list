@@ -142,9 +142,11 @@ function addNewTodo(title: string) {
     action: ['add'],
   })
 
+  console.log(editableNote.value?.todos)
   queueСhanges.value.push({
     action: 'add',
     from: { id: newId, documentId: str, title, isDone: false },
+    todoDocumentId: str,
   })
 }
 
@@ -162,7 +164,7 @@ function updateTodoInEditableNote(updatedTodo: {
   editableNote.value?.todos?.forEach(todo => {
     if (todo.documentId === updatedTodo.documentId) {
       todo.title = updatedTodo.title
-      todo.action = [...todo.action!, 'update']
+      todo.action = ['update']
     }
   })
 }
@@ -179,39 +181,41 @@ function updateNoteTitle({ title, from }: { title: string; from: string }) {
 function undoChange() {
   const changeItem = queueСhanges.value.pop()
 
-  const idx = editableNote.value?.todos?.findIndex(todo => {
-    return todo.documentId === changeItem!.todoDocumentId
-  })
+  const idx = editableNote.value?.todos?.findIndex(
+    todo => todo.documentId === changeItem?.todoDocumentId,
+  )
+
+  const currentTodo = editableNote.value?.todos![idx!]
 
   switch (changeItem?.action) {
     case 'add':
-      editableNote.value?.todos?.pop()
-
+      currentTodo!.action = ['delete']
+      stackСanceledСhanges.value.push(changeItem)
+      break
+    case 'delete':
+      currentTodo!.action = ['add']
       stackСanceledСhanges.value.push(changeItem)
       break
     case 'toggle':
-      const currentTodo = editableNote.value?.todos![idx!]
-      editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
-      stackСanceledСhanges.value.push(changeItem!)
-      break
-    case 'delete':
-      editableNote.value?.todos?.push(changeItem.from as Todo)
-      stackСanceledСhanges.value.push(changeItem!)
+      const toglleIdx = currentTodo!.action?.findIndex(val => val === 'toggle')
+      currentTodo?.action?.splice(toglleIdx!, 1)
+      currentTodo!.isDone = !currentTodo!.isDone
+      stackСanceledСhanges.value.push(changeItem)
       break
     case 'update':
-      editableNote.value?.todos?.forEach(todo => {
-        if (todo.documentId === changeItem.todoDocumentId) {
-          stackСanceledСhanges.value.push({
-            action: changeItem.action,
-            from: todo.title,
-            todoDocumentId: changeItem.todoDocumentId,
-          })
-          todo.title = changeItem.from as string
-        }
+      const updateIdx = currentTodo!.action?.findIndex(val => val === 'update')
+      currentTodo!.action?.splice(updateIdx!, 1)
+
+      stackСanceledСhanges.value.push({
+        action: changeItem.action,
+        from: currentTodo?.title,
+        todoDocumentId: changeItem.todoDocumentId,
       })
+
+      currentTodo!.title = changeItem.from as string
+
       break
     case 'updateNoteTitle':
-      console.log(editableNote.value?.title)
       stackСanceledСhanges.value.push({
         action: changeItem.action,
         from: editableNote.value?.title,
@@ -228,38 +232,38 @@ function redoUndoneChange() {
     return todo.documentId === changeItem!.todoDocumentId
   })
 
+  const currentTodo = editableNote.value?.todos![idx!]
+
   switch (changeItem?.action) {
     case 'add':
-      editableNote.value?.todos?.push(changeItem.from as Todo)
-      console.log(changeItem)
+      currentTodo!.action! = ['add']
       queueСhanges.value.push(changeItem)
       break
     case 'delete':
-      editableNote.value?.todos?.splice(idx!, 1)
+      currentTodo!.action! = ['delete']
       queueСhanges.value.push(changeItem)
       break
     case 'toggle':
-      const currentTodo = editableNote.value?.todos![idx!]
-      editableNote.value!.todos![idx!].isDone = !currentTodo?.isDone
+      currentTodo!.action?.push('toggle')
+      currentTodo!.isDone = !currentTodo!.isDone
       queueСhanges.value.push(changeItem)
       break
     case 'update':
+      currentTodo!.action = ['update']
       queueСhanges.value.push({
         action: changeItem.action,
-        from: changeItem.from,
+        from: currentTodo?.title,
         todoDocumentId: changeItem.todoDocumentId,
       })
-      editableNote.value?.todos?.forEach(todo => {
-        if (todo.documentId === changeItem.todoDocumentId) {
-          todo.title = changeItem.from as string
-        }
-      })
+
+      currentTodo!.title = changeItem.from as string
       break
     case 'updateNoteTitle':
       queueСhanges.value.push({
         action: changeItem.action,
         from: editableNote.value?.title,
       })
+
       editableNote.value!.title = changeItem.from as string
       break
   }

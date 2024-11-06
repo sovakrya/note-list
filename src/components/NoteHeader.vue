@@ -6,6 +6,9 @@ const emits = defineEmits<{
 }>()
 
 function addNote() {
+  if (!noteText.value) {
+    return
+  }
   emits('addNote', noteText.value)
 
   noteText.value = ''
