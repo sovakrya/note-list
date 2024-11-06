@@ -19,7 +19,7 @@ const dialogRemoveWarning = ref(false)
     <span class="note-title">{{ props.note.title }}</span>
 
     <div v-if="props.note.todos">
-      <ul v-for="todo of props.note.todos" :key="todo.id">
+      <ul v-for="todo of props.note.todos.slice(0, 2)" :key="todo.id">
         <li>{{ todo.title }}</li>
       </ul>
     </div>
@@ -45,6 +45,11 @@ const dialogRemoveWarning = ref(false)
   font-size: 18px;
 }
 
+.note-size {
+  height: 39px;
+  width: 39px;
+}
+
 .note-remove-btn {
   background: none;
   color: #132ea8;
@@ -56,6 +61,7 @@ const dialogRemoveWarning = ref(false)
   width: 80px;
   border-radius: 5px;
   transition: all 0.3s;
+  align-self: flex-end;
 }
 
 .note-remove-btn:hover {
