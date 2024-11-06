@@ -127,20 +127,20 @@ function closeDialog() {
 }
 
 .warning-btn-ok {
+  background-color: rgb(227 227 227);
+}
+
+.warning-btn-ok:hover {
+  background-color: rgb(209, 209, 209);
+}
+
+.warning-btn-cancel {
   background-color: rgb(63, 88, 201);
   color: azure;
   font-weight: 600;
 }
 
-.warning-btn-ok:hover {
-  background-color: rgb(86, 112, 226);
-}
-
-.warning-btn-cancel {
-  background-color: rgb(227 227 227);
-}
-
 .warning-btn-cancel:hover {
-  background-color: rgb(209, 209, 209);
+  background-color: rgb(86, 112, 226);
 }
 </style>

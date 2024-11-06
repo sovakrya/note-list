@@ -4,6 +4,7 @@ import SettingsContent from '@/components/SettingsContent.vue'
 import SettingsHeader from '@/components/SettingsHeader.vue'
 import {
   addTodo,
+  deleteNote,
   deleteTodo,
   getNote,
   updateNote,
@@ -12,7 +13,7 @@ import {
   type Todo,
 } from '@/service/noteApi'
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 type ModifiedNote = {
   titleNote?: string
@@ -41,6 +42,7 @@ const queueСhanges = ref<ModifiedNote[]>([])
 const stackСanceledСhanges = ref<ModifiedNote[]>([])
 
 const route = useRoute()
+const router = useRouter()
 const id = route.params.noteId as string
 const note = ref<Note>()
 const editableNote = ref<CopyNote>()
@@ -268,6 +270,12 @@ function redoUndoneChange() {
       break
   }
 }
+
+async function deleteNoteFromFetch() {
+  await deleteNote(note.value!.documentId)
+
+  router.push({ name: 'home' })
+}
 </script>
 
 <template>
@@ -277,7 +285,7 @@ function redoUndoneChange() {
     <SettingsHeader
       @undoChange="undoChange"
       @redoUndoneChange="redoUndoneChange"
-      @deleteNote=""
+      @deleteNote="deleteNoteFromFetch"
       :is-blocked-redo-undo-chage="stackСanceledСhanges.length"
       :is-blocked-undo-chage="queueСhanges.length"
     />
