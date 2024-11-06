@@ -4,15 +4,7 @@ import NoteHeader from './components/NoteHeader.vue'
 </script>
 
 <template>
-  <main class="main-box">
-    <NoteHeader />
-  </main>
+  <RouterView />
 </template>
 
-<style scoped>
-.main-box {
-  display: flex;
-  flex-direction: column;
-  padding: 40px;
-}
-</style>
+<style scoped></style>
