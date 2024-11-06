@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Todo } from '@/service/noteApi'
 import TodoItem from './TodoItem.vue'
+import type { CopyTodo } from '@/views/SettingsPage.vue'
 
 const emits = defineEmits<{
   checkTodo: [{ documentId: string; from: boolean }]
@@ -9,13 +10,14 @@ const emits = defineEmits<{
 }>()
 
 const props = defineProps<{
-  todos: Todo[]
+  todos: CopyTodo[]
 }>()
 </script>
 
 <template>
   <TodoItem
     v-for="todo of props.todos"
+    v-show="!todo.action?.includes('delete')"
     :key="todo.documentId"
     :todo
     @execute-todo="modifiedTodo => emits('checkTodo', modifiedTodo)"

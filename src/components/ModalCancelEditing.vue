@@ -58,8 +58,8 @@ function closeDialog() {
 </script>
 
 <template>
-  <dialog ref="cancelEditingDialog" class="remove-warning-box">
-    <div class="remove-warning-content-box">
+  <dialog ref="cancelEditingDialog" class="modal-box">
+    <div class="modal-content-box">
       <span class="warning-title"
         >Вы точно хотите отменить редактирование?</span
       >
@@ -78,3 +78,8 @@ function closeDialog() {
     </div>
   </dialog>
 </template>
+
+<style scoped>
+.modal-box {
+}
+</style>

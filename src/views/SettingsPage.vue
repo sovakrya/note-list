@@ -21,13 +21,29 @@ type ModifiedNote = {
   from: unknown
 }
 
+export type CopyTodo = {
+  id: number
+  documentId: string
+  title: string
+  isDone: boolean
+  note?: Note
+  action?: Array<'toggle' | 'delete' | 'add' | 'update' | ''>
+}
+
+type CopyNote = {
+  id: number
+  documentId: string
+  title: string
+  todos?: CopyTodo[]
+}
+
 const queueСhanges = ref<ModifiedNote[]>([])
 const stackСanceledСhanges = ref<ModifiedNote[]>([])
 
 const route = useRoute()
 const id = route.params.noteId as string
 const note = ref<Note>()
-const editableNote = ref<Note>()
+const editableNote = ref<CopyNote>()
 
 const dialog = ref(false)
 
@@ -36,38 +52,25 @@ async function saveNote() {
     await updateNote(editableNote.value!)
   }
 
-  for (
-    let i = 0;
-    i < editableNote.value!.todos!.length + note.value!.todos!.length;
-    i++
-  ) {
-    const itemEditableNote = editableNote.value!.todos![i]
-    const itemNote = note.value!.todos![i]
-
-    const a = editableNote.value?.todos?.find(
-      todo => todo.documentId === itemNote.documentId,
-    )
-    if (!a) {
-      await deleteTodo(itemNote.documentId)
+  for (let todo of editableNote.value!.todos!) {
+    if (todo.action?.includes('delete')) {
+      await deleteTodo(todo.documentId)
       continue
     }
 
-    console.log(itemEditableNote)
-    const b = note.value?.todos?.find(
-      todo => todo.documentId === itemEditableNote.documentId,
-    )
-
-    if (!b) {
-      await addTodo(itemEditableNote.title, note.value?.documentId!)
+    if (todo.action?.includes('add')) {
+      await addTodo(todo.title, todo.isDone, editableNote.value!.documentId)
       continue
-    } else {
-      if (itemEditableNote.isDone !== itemNote.isDone) {
-        await updateTodo(itemEditableNote)
-      }
+    }
 
-      if (itemEditableNote.title !== itemNote.title) {
-        await updateTodo(itemEditableNote)
-      }
+    if (todo.action?.includes('toggle') && !todo.action.includes('add')) {
+      await updateTodo(todo)
+      continue
+    }
+
+    if (todo.action?.includes('update') && !todo.action.includes('add')) {
+      await updateTodo(todo)
+      continue
     }
   }
 
@@ -76,6 +79,19 @@ async function saveNote() {
 getNote(id).then(res => {
   note.value = res.data
   editableNote.value = JSON.parse(JSON.stringify(note.value))
+  const copyTodos = editableNote.value?.todos?.map(todo => {
+    return (todo = {
+      id: todo.id,
+      documentId: todo.documentId,
+      isDone: todo.isDone,
+      title: todo.title,
+      action: [],
+    })
+  })
+
+  if (copyTodos) {
+    editableNote.value!.todos = copyTodos
+  }
 })
 
 function undoEditing() {
@@ -93,6 +109,7 @@ function toggleTodo(modifiedTodo: { documentId: string; from: boolean }) {
   editableNote.value?.todos?.forEach(todo => {
     if (todo.documentId === modifiedTodo.documentId) {
       todo.isDone = !modifiedTodo.from
+      todo.action = [...todo.action!, 'update']
     }
   })
 }
@@ -107,11 +124,13 @@ function removeTodo(todo: Todo) {
   const idx = editableNote.value?.todos?.findIndex(val => {
     return val.documentId === todo.documentId
   })
-  editableNote.value!.todos!.splice(idx!, 1)
+
+  editableNote.value!.todos![idx!].action?.push('delete')
 }
 
 let str = 'sdfsdf'
 let newId = 1000
+
 function addNewTodo(title: string) {
   str += 'a'
   newId += 1
@@ -120,6 +139,7 @@ function addNewTodo(title: string) {
     id: newId,
     isDone: false,
     title,
+    action: ['add'],
   })
 
   queueСhanges.value.push({
@@ -142,6 +162,7 @@ function updateTodoInEditableNote(updatedTodo: {
   editableNote.value?.todos?.forEach(todo => {
     if (todo.documentId === updatedTodo.documentId) {
       todo.title = updatedTodo.title
+      todo.action = [...todo.action!, 'update']
     }
   })
 }

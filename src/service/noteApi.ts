@@ -79,13 +79,13 @@ export async function deleteNote(documentId: string) {
   })
 }
 
-export async function addTodo(title: string, id: string) {
+export async function addTodo(title: string, isDone: boolean, id: string) {
   const resp = await fetch(`${HOST}/api/todos`, {
     method: 'POST',
     body: JSON.stringify({
       data: {
         title: title,
-        isDone: false,
+        isDone: isDone,
         note: {
           connect: { documentId: id },
         },
